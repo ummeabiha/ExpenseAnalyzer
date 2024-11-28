@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Set Budget{% endblock %}
+{% block content %}
+    <h2>Set Monthly Budget</h2>
+    <form id="set-budget-form" method="POST" action="{{ url_for('budget.set_budget') }}">
+        <label>Monthly Limit:</label>
+        <input type="number" name="monthly_limit" step="0.01" required>
+        <button id="set-budget-submit-button" type="submit">Set Budget</button>
+    </form>
+{% endblock %}

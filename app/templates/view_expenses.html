@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Your Expenses - ExpenseAnalyzer{% endblock %}
+{% block content %}
+
+    <div class="title-container">
+        <h2>Your Expenses</h2>
+        <div id="flash-messages-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message|safe }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <form id="add-new-expense-form" action="{{ url_for('expenses.add_expense') }}" style="margin-bottom: 10px;">
+        <button id="add-new-expense-button" type="submit">Add New Expense</button>
+    </form>
+
+    {% if has_expenses %}
+        <form id="delete-all-expenses-form" action="{{ url_for('expenses.delete_all_expenses') }}" method="post" style="margin-bottom: 10px;">
+            <button id="delete-all-expenses-button" type="submit" onclick="return confirm('Are you sure you want to delete all expenses?')">Delete All Expenses</button>
+        </form>
+    {% endif %}
+
+    {% if not current_user.budget %}
+        <h3>Total: ${{ total|round(2) }}</h3>
+    {% endif %}
+
+    {% if current_user.budget %}
+        <h3>Budget: ${{ budget_limit|round(2) }}</h3>
+        <h3>Current Spending: ${{ current_spending|round(2) }}</h3>
+        {% if current_spending > budget_limit %}
+            <p style="color: rgb(145, 53, 53); font-size: large; font-weight: bold; font-style: italic;">
+                ⚠ You have exceeded your budget limit by ${{ (current_spending - budget_limit) | round(2) }}!
+            </p>
+        {% endif %}
+            <form id="delete-budget-form" method="POST" action="{{ url_for('budget.delete_budget') }}" style="display:inline;">
+                <button id="delete-budget-button" type="submit">Delete Budget Limit</button>
+            </form>
+            <form id="update-budget-form-link" action="{{ url_for('budget.update_budget') }}" style="display:inline;">
+                <button id="update-budget-button" type="submit">Update Budget</button>
+            </form>
+        </div>
+    {% else %}
+        <p>No budget set.
+            <form id="set-budget-form-link" action="{{ url_for('budget.set_budget') }}" class="form-inline;">
+                <button id="set-budget-button" type="submit">Set a Budget</button>
+            </form>
+        </p>
+    {% endif %}
+    <!-- Currency Conversion Form -->
+    <form id="expense-form" method="POST" action="{{ url_for('expenses.view_expenses') }}" class="currency-conversion-form">
+        <div class="currency-row">
+            <label for="from_currency">From Currency:</label>
+            <select name="from_currency" id="from_currency">
+                {% for currency in currency_data["currencies"] %}
+                <option value="{{ currency.currency_code }}" {% if currency.currency_code==from_currency %}selected{% endif %}>
+                    {{ currency.country }} ({{ currency.currency_code }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="currency-row">
+            <label for="to_currency">To Currency:</label>
+            <select name="to_currency" id="to_currency">
+                {% for currency in currency_data["currencies"] %}
+                <option value="{{ currency.currency_code }}" {% if currency.currency_code==to_currency %}selected{% endif %}>
+                    {{ currency.country }} ({{ currency.currency_code }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    <button id="submit-button" type="submit" class="currency-button">Get Conversion Rate</button>
+    </form>
+
+    {% if conversion_rate is not none %}
+    <div class="conversion-rate-container">
+        <p class="conversion-rate">Conversion Rate ({{ from_currency }} to {{ to_currency }}): {{ conversion_rate|round(4) }}</p>
+        <form id="expense-form" action="{{ url_for('expenses.view_expenses') }}" class="reset-button">
+            <button id="submit-button" type="submit">Reset</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Flex Container for Table and Charts -->
+    <div class="content-container">
+        <!-- Expenses Table -->
+        <div class="expenses-table">
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.name }}</td>
+                    <td>{{ expense.amount }}</td>
+                    <td>{{ expense.category }}</td>
+                    <td>{{ expense.date }}</td>
+                    <td>
+                        <form id="delete-expense-form-{{ expense.id }}" method="POST" action="{{ url_for('expenses.delete_expense', expense_id=expense.id) }}" style="display:inline;">
+                            <button id="delete-expense-button-{{ expense.id }}" type="submit">Delete</button>
+                        </form>
+                        <form id="edit-expense-form-{{ expense.id }}" action="{{ url_for('expenses.edit_expense', expense_id=expense.id) }}" style="display:inline;">
+                            <button id="edit-expense-button-{{ expense.id }}" type="submit">Edit</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Charts Container -->
+        {% if has_expenses %}
+            <div class="charts-container">
+                <div class="side-by-side">
+                    <!-- Monthly Spending Bar Chart -->
+                    <img src="data:image/png;base64,{{ bar_chart }}" class="chart" alt="Monthly Spending Bar Chart">
+                </div>
+                <div class="side-by-side">
+                    <!-- Category Spending Pie Chart -->
+                    <img src="data:image/png;base64,{{ pie_chart }}" class="chart" alt="Category Spending Pie Chart">
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

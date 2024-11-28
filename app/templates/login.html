@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - ExpenseAnalyzer</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.128x128.png') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-page">
+    <header>
+        <h1 class="app-title"><a href="/" style="text-decoration: none; color: inherit;">ExpenseAnalyzer</a></h1>
+    </header>
+    <div class="auth-container">
+        <div class="auth-image">
+            <img src="{{ url_for('static', filename='logo.512x512.png') }}" alt="ExpenseAnalyzer Logo">
+        </div>
+        <div class="auth-form">
+            <h2>Login</h2>
+            <form id="login-form" method="POST" action="{{ url_for('auth.login') }}">
+                {{ form.hidden_tag() }}
+                <label>Email:</label> {{ form.email }}
+                <label>Password:</label> {{ form.password }}
+                <button id="login-submit-button" type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a class="auth-link" href="{{ url_for('auth.register') }}">Register here</a></p>
+        </div>
+        <div id="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div id="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">{{ message|safe }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/interaction_handler.js') }}" defer></script>
+</body>
+</html>

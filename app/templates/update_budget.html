@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Update Budget{% endblock %}
+{% block content %}
+    <h2>Update Budget</h2>
+    <form id="update-budget-form" method="POST">
+        <label>Monthly Limit:</label>
+        <input type="number" name="monthly_limit" step="0.01" value="{{ current_user.budget.monthly_limit }}" required>
+        <button id="update-budget-submit-button" type="submit">Update Budget</button>
+    </form>
+{% endblock %}

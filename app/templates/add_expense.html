@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Add Expense{% endblock %}
+{% block content %}
+    <h2>Add Expense</h2>
+    <form id="add-expense-form" method="POST" action="{{ url_for('expenses.add_expense') }}" class="form-inline">
+        <label>Name:</label>
+        <input type="text" name="name" required>
+
+        <label>Amount:</label>
+        <input type="number" name="amount" step="0.01" required>
+
+        <label>Category:</label>
+        <input type="text" name="category" required>
+
+        <label>Date:</label>
+        <input type="date" name="date" required>
+
+        <button type="submit" id="add-expense-submit-button">Add Expense</button>
+    </form>
+
+    <form id="cancel-add-expense-form" action="{{ url_for('expenses.view_expenses') }}" style="display: inline;"
+        class="form-inline">
+        <button type="submit" id="cancel-add-expense-button">Cancel</button>
+    </form>
+{% endblock %}
