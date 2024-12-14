@@ -68,6 +68,10 @@ def view_expenses():
 @login_required
 def delete_expense(expense_id):
     """Route to delete an expense by ID for the current user."""
+    if current_user.username == "Guest":
+        flash("Guest users cannot delete expenses.", "warning")
+        return redirect(url_for("expenses.view_expenses"))
+
     expense = Expense.query.get_or_404(expense_id)
 
     if expense.user_id != current_user.id:
@@ -91,6 +95,10 @@ def delete_expense(expense_id):
 @login_required
 def add_expense():
     """Route to add an expense for the current user. Render the add expense template."""
+    if current_user.username == "Guest":
+        flash("Guest users cannot add new expenses.", "warning")
+        return redirect(url_for("expenses.view_expenses"))
+
     if request.method == "POST":
         name = request.form["name"]
         amount = float(request.form["amount"])
@@ -117,6 +125,7 @@ def add_expense():
 def edit_expense(expense_id):
     """Route to edit an expense by ID for the current user. Render the edit expense template."""
     expense = Expense.query.get_or_404(expense_id)
+
     if request.method == "POST":
         old_amount = expense.amount
         new_amount = float(request.form["amount"])
@@ -145,6 +154,9 @@ def edit_expense(expense_id):
 @login_required
 def delete_all_expenses():
     """Route to delete all expenses for the current user if confirmed."""
+    if current_user.username == 'Guest':
+        flash('Guest users cannot delete expenses.', 'warning')
+        return redirect(url_for('expenses.view_expenses'))
     if current_user.budget:
         # Reset the current expense total in the budget
         current_user.budget.current_expense_total = 0

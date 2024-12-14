@@ -1,3 +1,4 @@
+from datetime import datetime # Added this for local DB
 from collections import defaultdict
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app, url_for
@@ -35,7 +36,7 @@ def send_activation_email(user):
     """Send an account activation email to the user."""
     token = generate_activation_token(user.id)
     link = url_for("auth.activate_account", token=token, _external=True)
-    msg = Message("Activate Your Account", sender="no-reply@expenseanalyzer", recipients=[user.email])
+    msg = Message("Activate Your Account", sender="no-reply@expenseanalyzer.com", recipients=[user.email])
     msg.body = f"Hello!\n\nPlease activate your account by clicking the following link: {link}"
     mail.send(msg)
 
@@ -65,7 +66,7 @@ def get_monthly_data(user_id):
     # Group expenses by month and sum up the amounts
     monthly_data = defaultdict(float)
     for expense in expenses:
-        month = expense.date.strftime("%Y-%m")  # Format as "YYYY-MM" for grouping by month
+        month = datetime.strptime(expense.date, "%Y-%m-%d").strftime("%Y-%m")  # Format as "YYYY-MM" for grouping by month
         monthly_data[month] += expense.amount
 
     # Convert the defaultdict to a sorted list of tuples for plotting

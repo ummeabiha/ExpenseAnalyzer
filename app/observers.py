@@ -43,7 +43,7 @@ class AlertObserver(Observer):
 
         msg = Message(
             "Budget Exceeded Alert!",
-            sender="no-reply@expenseanalyzer.com",
+            sender="YousifZito4SA3@gmail.com",
             recipients=[current_user.email],
         )
         msg.body = (

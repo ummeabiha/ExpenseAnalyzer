@@ -59,20 +59,28 @@ pip install -r requirements.txt
 
 ### 4. Configure Environment Variables
 
-Create a `.env` file in the root directory and add the following environment variables:
+#### For Linux Users
 
-```yaml
-SECRET_KEY=your_secret_key
-DATABASE_URL=your_database_url
-MAIL_USERNAME=your_email
-MAIL_PASSWORD=your_email_password
-API_KEY=your_exchangerate_api_key
+Create a `configExpenseAnalyzer.json` file in the `/etc/` directory and add the following environment variables:
+
+```json
+{
+   "SECRET_KEY": "your_secret_key",
+   "SQLALCHEMY_DATABASE_URI": "your_database_url",
+   "EMAIL_USER": "your_email",
+   "EMAIL_PASS": "your_email_app_password",
+	"API_KEY": "your_exchangerate_api_key"
+}
 ```
 
-- Replace`your_secret_key` with your Flask secret key.
-- Replace`your_database_url` with the URL for your Azure SQL Database.
-- Replace`your_email` and`your_email_password` with the credentials for the email service used for notifications.
-- Replace`your_exchangerate_api_key` with your ExchangeRate API key.
+- Replace`your_secret_key`  with your Flask application's secret key for session management and security.
+- Replace`your_database_uri` with the database connection URI for your Azure SQL Database or SQLite. For SQLite, this might look like `sqlite:///path_to_db`.db.
+- Replace`your_email` and`your_email_password` with the email and app-specific password for the email service used to send notifications (e.g., Gmail, Outlook).
+- Replace`your_exchangerate_api_key` with your API key from the [ExchangeRate-API](https://www.exchangerate-api.com/).
+
+#### For Windows 
+
+Place the `configExpenseAnalyzer.json` file in the `instance` folder under the ExpenseAnalyzer directory. Ensure the application code references this path for Windows systems.
 
 ### 5. Run the Application
 
@@ -126,6 +134,10 @@ ExpenseAnalyzer/
 |   requirements.txt          # Lists Python packages required to run the application
 |   run.py                    # Entry point for running the application
 |   README.md                 # Project documentation and instructions
+|
++---instance                  # Folder for instance-specific configuration files
+|       configExpenseAnalyzer.json # JSON file for storing environment variables (not included in version control)
+|
 \---app                       # Main application folder containing configurations, modules, and routes
     |   config.py             # Configuration file for environment variables, database URI, and other settings
     |   currency_loader.py    # Module to load currency data from the YAML file

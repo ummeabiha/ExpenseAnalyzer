@@ -1,8 +1,8 @@
-from .extensions import db, login_manager
+from .extensions import db, login_manager, mail
 from flask_login import UserMixin
 from datetime import datetime, timezone
 from .observers import Subject, AlertObserver, LoggingObserver
-
+from sqlalchemy.orm import validates
 
 @login_manager.user_loader  # Register the user loader function.
 def load_user(user_id):
@@ -34,7 +34,7 @@ class Expense(db.Model):
     name = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
-    date = db.Column(db.Date, nullable=False, default=datetime.now(timezone.utc))
+    date = db.Column(db.String(50), nullable=False, default=lambda: datetime.utcnow().strftime('%Y-%m-%d'))
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
 

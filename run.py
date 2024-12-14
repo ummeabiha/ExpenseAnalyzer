@@ -1,5 +1,5 @@
 # Name: Yousif Zito
-# Date: 2024-11-27
+# Date: 2024-11-04
 # Purpose: 4SA3 Project - ExpenseAnalyzer Application
 # Description: This code is part of the ExpenseAnalyzer application, a web-based
 # platform designed for tracking and managing personal or business expenses. The
@@ -18,4 +18,4 @@ app = create_app()
 
 # Run the app
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

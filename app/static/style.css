@@ -358,3 +358,77 @@ tr:hover {
     display: flex;
     align-items: center;
 }
+
+/* Demo Implementation Styles */
+.guest-banner {
+    margin: 45px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.guest-banner p {
+    margin: 0;
+    font-size: 16px;
+    text-shadow: 0px 0px 1px black;
+}
+
+.guest-banner a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.guest-banner a:hover {
+    text-decoration: none;
+}
+
+/* Container for buttons to align them side-by-side */
+.auth-form .button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Styling for the Login button */
+#login-submit-button {
+    flex: 1;
+    background-color: #008080;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#login-submit-button:hover {
+    background-color: #006666;
+}
+
+/* Styling for the Continue as Guest button */
+#guest-login-btn {
+    flex: 1;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#guest-login-btn:hover {
+    background-color: #5a6268;
+}

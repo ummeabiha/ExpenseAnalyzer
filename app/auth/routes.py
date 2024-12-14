@@ -15,7 +15,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         # Check if the email and/or username already exists in the database
-        existing_user = User.query.filter_by(email=form.email.data).first()
+        existing_user = User.query.filter(User.email.ilike(form.email.data)).first()
         existing_username = User.query.filter_by(username=form.username.data).first()
         if existing_user and existing_username:
             flash("The email and username are already taken.<br>Please choose a different email and username.", "danger")
@@ -42,7 +42,7 @@ def login():
     """Route to log in a user."""
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter(User.email.ilike(form.email.data)).first()
         if user is None:
             flash("No account found with that email.<br>Please check your email or register for a new account.", "warning")
             return redirect(url_for("auth.login"))
@@ -81,3 +81,18 @@ def activate_account(token):
         flash("Your account has been activated!<br>You can now log in.", "success")
     # Redirect to the login page
     return redirect(url_for("auth.login"))
+
+@auth_bp.route('/guest_login', methods=['POST'])
+def guest_login():
+    """Logs in the user as a guest."""
+    # Fetch the Guest user from the database
+    guest_user = User.query.filter_by(username='Guest').first()
+
+    if not guest_user:
+        flash("Guest account not found.", "danger")
+        return redirect(url_for('auth.login'))
+
+    # Log in the Guest user
+    login_user(guest_user)
+    flash("You are logged in as a guest.", "info")
+    return redirect(url_for('expenses.view_expenses'))

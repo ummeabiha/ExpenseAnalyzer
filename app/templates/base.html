@@ -13,7 +13,7 @@
     <div class="header">
         <span><a class="username" href="/">Welcome, {{ current_user.username }}!</a></span>
 
-        <span class="header-conversion-rate">CAD/USD Exchange Rate Forecast: {{ cad_usd_forecast }}  </span>
+        <span class="header-conversion-rate">CAD/USD Exchange Rate Forecast: {{ cad_usd_forecast }} </span>
         <form id="expense-form" method="POST" action="{{ url_for('auth.logout') }}">
             <button type="submit" id="submit-button">logout</button>
         </form>

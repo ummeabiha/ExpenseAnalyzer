@@ -1,6 +1,13 @@
+import os
 import json
 
-with open("/etc/configExpenseAnalyzer.json") as config_file:
+# Detect OS and load the JSON config
+if os.name == "nt":
+    config_path = os.path.join(os.getcwd(),"instance", "configExpenseAnalyzer.json")
+else:
+    config_path = "/etc/configExpenseAnalyzer.json"
+
+with open(config_path) as config_file:
     config = json.load(config_file)
 
 class Config:
