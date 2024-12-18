@@ -15,7 +15,7 @@ ExpenseAnalyzer is a web-based application designed to help users track and mana
 - Python (Flask) for the backend
 - SQLAlchemy for ORM and database management
 - Azure SQL Database for data storage
-- HTML/CSS and Bootstrap for frontend design
+- HTML/CSS for frontend design
 - ExchangeRate API for real-time currency conversion
 
 ## Prerequisites
