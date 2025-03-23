@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from ..currency_loader import load_currency_data
 from ..utils import (
     get_currency_conversion,
     get_monthly_data,
@@ -30,6 +31,7 @@ def view_expenses():
     has_expenses = len(expenses) > 0
     total = sum(expense.amount for expense in expenses)
 
+    currency_data = load_currency_data()
     # Default values
     conversion_rate = None
     from_currency = request.form.get("from_currency", "CAD")
@@ -54,6 +56,7 @@ def view_expenses():
         expenses=expenses,
         total=total,
         conversion_rate=conversion_rate,
+        currency_data=currency_data,
         from_currency=from_currency,
         to_currency=to_currency,
         current_spending=budget_singleton.current_total,

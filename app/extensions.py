@@ -1,16 +1,26 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_bcrypt import Bcrypt
-from tenacity import retry, stop_after_attempt, wait_exponential
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 mail = Mail()
+migrate = Migrate()  
 
-# Retry logic with exponential backoff for database initialization (10 attempts)
-@retry(stop=stop_after_attempt(10), wait=wait_exponential(multiplier=1, max=40))
-def init_db_with_retry(app):
-    """Initialize the SQLAlchemy database with retry logic."""
-    db.init_app(app)
+def init_db_with_retry(app, retries=3, delay=2):
+    """Initialize the database with retry logic."""
+    import time
+    for attempt in range(retries):
+        try:
+            db.init_app(app)
+            migrate.init_app(app, db)  
+            with app.app_context():
+                db.create_all()
+            print("Database initialized successfully.")
+            break
+        except Exception as e:
+            print(f"Database initialization failed (attempt {attempt + 1}): {e}")
+            time.sleep(delay)

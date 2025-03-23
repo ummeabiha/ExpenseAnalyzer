@@ -1,0 +1,52 @@
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore environment and virtual environment directories
+env/
+venv/
+
+# Flask and instance-specific configuration
+instance/
+configExpenseAnalyzer.json
+*.json
+
+# Migrations (Alembic)
+migrations/
+migrations/versions/
+
+# Ignore environment variable files
+.env
+*.env
+
+# Ignore data files that might change
+app/data/currencies.yml
+
+# Ignore log files and debug output
+*.log
+logs/
+
+# Ignore cache files
+.cache/
+*.bak
+
+# Ignore compiled and temporary files
+*.swp
+*.swo
+.DS_Store
+
+# Ignore dependencies (should be installed via requirements.txt)
+pip-wheel-metadata/
+pip-log.txt
+
+# Ignore IDE and editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Ignore database files (if any)
+*.sqlite3
+*.db
+*.sql
