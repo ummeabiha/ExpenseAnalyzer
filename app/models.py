@@ -1,7 +1,7 @@
 from .extensions import db, login_manager, mail
 from flask_login import UserMixin
 from datetime import datetime, timezone
-from .observers import Subject, AlertObserver, LoggingObserver
+from .observers import Subject, AlertObserver, LoggingObserver, SMSObserver, DashboardObserver
 from sqlalchemy.orm import validates
 
 @login_manager.user_loader  # Register the user loader function.
@@ -84,6 +84,10 @@ class BudgetSingleton(Subject):
             self.add_observer(AlertObserver())
         if not any(isinstance(observer, LoggingObserver) for observer in self._observers):
             self.add_observer(LoggingObserver())
+        if not any(isinstance(observer, SMSObserver) for observer in self._observers):
+            self.add_observer(SMSObserver())
+        if not any(isinstance(observer, DashboardObserver) for observer in self._observers):
+            self.add_observer(DashboardObserver())
 
     @classmethod # Define a class method to retrieve or create a singleton instance.
     def get_instance(cls, user_id):
