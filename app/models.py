@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from datetime import datetime, timezone
 from .observers import Subject, AlertObserver, LoggingObserver
 from sqlalchemy.orm import validates
+import time
 
 @login_manager.user_loader  # Register the user loader function.
 def load_user(user_id):
@@ -68,66 +69,77 @@ class BudgetSingleton(Subject):
     _instances = {}
 
     def __init__(self, user):
-        """
-        Initialize the singleton state.
-        limit: Monthly budget limit for the user.
-        current_total: Current total spending for the user.
-        alert_sent: Flag to indicate if an alert has been sent for exceeding the budget.
-        """
+        """Initialize the singleton state for a user."""
         super().__init__()
         self.user = user
         self.limit = 0
         self.current_total = 0
         self.alert_sent = False
-        # Register the observers during initialization
-        if not any(isinstance(observer, AlertObserver) for observer in self._observers):
-            self.add_observer(AlertObserver())
-        if not any(isinstance(observer, LoggingObserver) for observer in self._observers):
-            self.add_observer(LoggingObserver())
+        self.last_accessed = time.time()  # Track last accessed time
 
-    @classmethod # Define a class method to retrieve or create a singleton instance.
+        self._register_observers()
+
+    def _register_observers(self):
+        """Ensure all required observers are registered only once."""
+        observer_classes = [AlertObserver, LoggingObserver]
+        existing_types = {type(observer) for observer in self._observers}
+
+        for observer_class in observer_classes:
+            if observer_class not in existing_types:
+                self.add_observer(observer_class())
+
+    @classmethod
     def get_instance(cls, user_id):
         """Retrieve or create a singleton instance for the user."""
         if user_id not in cls._instances:
             user = User.query.get(user_id)
             if user:
                 cls._instances[user_id] = cls(user)
-        return cls._instances[user_id]
+
+        cls._instances[user_id].last_accessed = time.time()
+        return cls._instances.get(user_id)
+
+    @classmethod
+    def cleanup_expired_instances(cls, timeout=3600):
+        """Remove inactive instances after timeout (default: 1 hour)."""
+        current_time = time.time()
+        expired_keys = [key for key, instance in cls._instances.items()
+                        if current_time - instance.last_accessed > timeout]
+
+        for key in expired_keys:
+            del cls._instances[key]
+            print(f"[DEBUG] Removed expired BudgetSingleton for user {key}")
 
     def update(self, budget):
-        """Update the singleton state and notify observers."""
-        # Synchronize the singleton's state with the budget
+        """Update the singleton state and notify observers if necessary."""
+        if self.limit == budget.monthly_limit and self.current_total == budget.current_expense_total:
+            print("[DEBUG] No changes detected. Skipping unnecessary update.")
+            return  # Prevent redundant updates
+
         self.limit = budget.monthly_limit
         self.current_total = budget.current_expense_total
         self.alert_sent = budget.alert_sent
 
-        # Debugging logs for state update
         print(f"[DEBUG] Singleton Updated: Limit={self.limit}, Current Total={self.current_total}, Alert Sent={self.alert_sent}")
 
-        # Reset the alert if the current total is under the limit and an alert was previously sent
         if self.current_total <= self.limit and self.alert_sent:
-            print("[DEBUG] Budget is now under limit. Resetting alert flag.")
+            print("[DEBUG] Budget is under limit. Resetting alert flag.")
             self.alert_sent = False
             budget.alert_sent = False
             db.session.commit()
 
-        # Only trigger alert if the budget limit is exceeded and alert hasn't been sent
         if self.current_total > self.limit and not self.alert_sent:
             self.notify_observers()
-            # Update the alert state after notifying observers
             self.alert_sent = True
             budget.alert_sent = True
             db.session.commit()
-
-        # Debugging logs for state update
-        print(f"[DEBUG] Singleton Updated: Limit={self.limit}, Current Total={self.current_total}, Alert Sent={self.alert_sent}")
 
     def set_limit(self, limit):
         """Set the budget limit."""
         self.limit = limit
 
     def update_total(self, amount):
-        """Update the current spending total for the user."""
+        """Update the current spending total."""
         self.current_total += amount
 
     def reset_alert(self):
