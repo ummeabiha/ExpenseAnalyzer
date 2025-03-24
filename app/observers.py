@@ -40,17 +40,16 @@ class AlertObserver(Observer):
         from flask_mail import Message
         from flask_login import current_user
         from app.extensions import mail
+        from flask import current_app
 
-        msg = Message(
-            "Budget Exceeded Alert!",
-            sender="YousifZito4SA3@gmail.com",
-            recipients=[current_user.email],
-        )
-        msg.body = (
-            f"Hello {current_user.username},\n\n"
-            f"You have exceeded your budget by ${excess_amount:.2f}.\n\nThank you!"
-        )
-        mail.send(msg)
+        with current_app.app_context():  
+            msg = Message(
+                "Budget Exceeded Alert!",
+                sender="YousifZito4SA3@gmail.com",
+                recipients=[current_user.email],
+            )
+            msg.body = f"Hello {current_user.username},\n\nYou have exceeded your budget by ${excess_amount:.2f}.\n\nThank you!"
+            # mail.send(msg)
 
 class LoggingObserver(Observer):
     """Observer for logging budget changes."""
@@ -59,3 +58,32 @@ class LoggingObserver(Observer):
             print("[LOG] Budget deleted: Limit=0, Current Total=0")
         else:
             print(f"[LOG] Budget updated: Limit={subject.limit}, Current Total={subject.current_total}")
+
+class SMSObserver(Observer):
+    """Observer for sending SMS budget alerts."""
+    
+    def update(self, subject):
+        """Send an SMS alert when the budget is exceeded."""
+        if subject.limit == 0:
+            return
+        
+        if subject.current_total > subject.limit:
+            excess_amount = subject.current_total - subject.limit
+            self.send_sms(excess_amount)
+            subject.alert_sent = True
+
+    def send_sms(self, excess_amount):
+        """Simulate sending an SMS."""
+        print(f"[SMS ALERT] You have exceeded your budget by ${excess_amount:.2f}!")
+
+class DashboardObserver(Observer):
+    """Observer for updating the UI dashboard."""
+    
+    def update(self, subject):
+        """Update the frontend dashboard with the latest budget data."""
+        print(f"[DASHBOARD] Updating UI: Limit={subject.limit}, Current Total={subject.current_total}")
+        self.update_ui(subject.limit, subject.current_total)
+
+    def update_ui(self, limit, total):
+        """Simulate sending data to the frontend dashboard."""
+        print(f"[DASHBOARD] Updated: New Limit = {limit}, Current Spending = {total}")

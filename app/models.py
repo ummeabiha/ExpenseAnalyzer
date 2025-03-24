@@ -1,7 +1,7 @@
 from .extensions import db, login_manager, mail
 from flask_login import UserMixin
 from datetime import datetime, timezone
-from .observers import Subject, AlertObserver, LoggingObserver
+from .observers import Subject, AlertObserver, LoggingObserver, SMSObserver, DashboardObserver
 from sqlalchemy.orm import validates
 import time
 
@@ -81,7 +81,7 @@ class BudgetSingleton(Subject):
 
     def _register_observers(self):
         """Ensure all required observers are registered only once."""
-        observer_classes = [AlertObserver, LoggingObserver]
+        observer_classes = [AlertObserver, LoggingObserver, SMSObserver, DashboardObserver]
         existing_types = {type(observer) for observer in self._observers}
 
         for observer_class in observer_classes:
