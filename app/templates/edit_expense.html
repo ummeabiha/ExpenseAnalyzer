@@ -10,7 +10,13 @@
         <input type="number" name="amount" step="0.01" value="{{ expense.amount }}" required>
 
         <label>Category:</label>
-        <input type="text" name="category" value="{{ expense.category }}" required>
+     <select name="category" id="category-dropdown" required>
+    <option value="Food" {% if expense.category == 'Food' %}selected{% endif %}>Food</option>
+    <option value="Travel" {% if expense.category == 'Travel' %}selected{% endif %}>Travel</option>
+    <option value="Entertainment" {% if expense.category == 'Entertainment' %}selected{% endif %}>Entertainment</option>
+    <option value="Other" {% if expense.category == 'Other' %}selected{% endif %}>Other</option>
+     </select>
+
 
         <label>Date:</label>
         <input type="date" name="date" value="{{ expense.date }}" required>

@@ -2,18 +2,27 @@
 {% block title %}Add Expense{% endblock %}
 {% block content %}
     <h2>Add Expense</h2>
+    
     <form id="add-expense-form" method="POST" action="{{ url_for('expenses.add_expense') }}" class="form-inline">
         <label>Name:</label>
         <input type="text" name="name" required>
 
         <label>Amount:</label>
-        <input type="number" name="amount" step="0.01" required>
+        <input type="number" name="amount" id="amount-input" step="0.01" required>
 
         <label>Category:</label>
-        <input type="text" name="category" required>
+        <select name="category" id="category-dropdown" required>
+            <option value="Food">Food</option>
+            <option value="Travel">Travel</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Other">Other</option>
+        </select>
 
         <label>Date:</label>
         <input type="date" name="date" required>
+
+        <!-- Taxed Amount Display -->
+        <p><strong>Total After Tax: </strong><span id="taxed-amount">$0.00</span></p>
 
         <button type="submit" id="add-expense-submit-button">Add Expense</button>
     </form>
@@ -22,4 +31,52 @@
         class="form-inline">
         <button type="submit" id="cancel-add-expense-button">Cancel</button>
     </form>
+
+    <hr>
+
+    <!-- Display Existing Expenses -->
+    <h3>Expense List</h3>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Base Amount</th>
+            <th>Taxed Amount</th>
+            <th>Date</th>
+        </tr>
+        {% for expense in expenses %}
+        <tr>
+            <td>{{ expense.name }}</td>
+            <td>{{ expense.category }}</td>
+            <td>${{ "%.2f"|format(expense.amount / (1 + (expense.tax_rate / 100))) }}</td>
+            <td>${{ "%.2f"|format(expense.amount) }}</td>
+            <td>{{ expense.date }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const categoryDropdown = document.getElementById("category-dropdown");
+            const amountInput = document.getElementById("amount-input");
+            const taxedAmountDisplay = document.getElementById("taxed-amount");
+
+            function updateTaxedAmount() {
+                const amount = parseFloat(amountInput.value) || 0;
+                const category = categoryDropdown.value;
+
+                let taxRate = 0.1; // Default 10%
+                if (category === "Food") taxRate = 0.05; 
+                if (category === "Travel") taxRate = 0.15;
+                if (category === "Entertainment") taxRate = 0.2;
+
+                const taxedAmount = amount + (amount * taxRate);
+                taxedAmountDisplay.textContent = `$${taxedAmount.toFixed(2)}`;
+            }
+
+            categoryDropdown.addEventListener("change", updateTaxedAmount);
+            amountInput.addEventListener("input", updateTaxedAmount);
+        });
+    </script>
+
 {% endblock %}
